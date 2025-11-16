@@ -251,7 +251,7 @@ void loop() {
   // Periodic IoT upload every 16 seconds (API rate limit)
   static unsigned long lastUploadTime = 0;
   unsigned long currentMillis = millis();
-  if (currentMillis - lastUploadTime >= 5000UL)
+  if (currentMillis - lastUploadTime >= 30000UL)
   {
     lastUploadTime = currentMillis;
     upload_iot(beatAvg, spo2, temperatureF, t, fval, lval, distance, s2);
