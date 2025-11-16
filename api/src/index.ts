@@ -1,4 +1,5 @@
 import { Elysia } from "elysia";
+import { cors } from "@elysiajs/cors";
 import { initDb, pool } from "./db";
 import { authenticateDevice, AuthError, ValidationError } from "./auth";
 
@@ -67,6 +68,9 @@ function parseTimestamp(value: unknown): Date | null {
 }
 
 const app = new Elysia()
+  .use(cors({
+    origin: "*"
+  }))
   .onError(({ error, set }) => {
     // Let normal 404s be quiet and just respond with not found
     if ((error as any)?.code === "NOT_FOUND") {
@@ -224,6 +228,10 @@ const app = new Elysia()
     set.status = 204;
     return;
   })
+
+
+
+
   .get("/api/v1/readings", async ({ query, request }) => {
     const q = query as Record<string, string | string[] | undefined>;
     const deviceId = (q.device_id as string) || "";
@@ -261,6 +269,17 @@ const app = new Elysia()
     );
 
     return result.rows;
+  })
+  .get("/api/v1/devices", async () => {
+    const result = await pool.query(
+      `
+      SELECT id, last_seen_at
+      FROM devices
+      ORDER BY id
+    `
+    );
+
+    return result.rows.map((row: { id: any; }) => row.id);
   });
 
 (async () => {
