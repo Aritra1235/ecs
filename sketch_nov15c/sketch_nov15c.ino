@@ -3,7 +3,7 @@
 #include "heartRate.h"
 
 MAX30105 particleSensor;
-int spo2 = 0, ssum = 0, hsum = 0;
+int spo2 = 0, ssum = 0;
 int cnt = 0;
 float temperatureF;
 const byte RATE_SIZE = 4; //Increase this for more averaging. 4 is good.
@@ -143,16 +143,15 @@ void loop() {
     spo2 = 0;
   }
 
+  // Accumulate SpO2 only (beatAvg is already averaged over 4 beats)
   ssum = ssum + spo2;
-  hsum = hsum + beatAvg;
   cnt = cnt + 1;
   if (cnt == 10)
   {
     cnt = 0;
     spo2 = ssum / 10;
-    beatAvg = hsum / 10;
     ssum = 0;
-    hsum = 0;
+    
     if (irValue < 50000)
     {
       lcd.clear();
