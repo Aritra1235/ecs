@@ -101,6 +101,17 @@ const app = new Elysia()
     const distanceCm = parseNumber(q.field7, "field7", { integer: true });
     const auxRaw = parseNumber(q.field8, "field8", { integer: true });
 
+    console.log("Incoming /update payload:", {
+      heartBpm,
+      spo2,
+      skinTempF,
+      envTempC,
+      flame,
+      lightRaw,
+      distanceCm,
+      auxRaw,
+    });
+
     // Ensure device exists (api_key_hash isn't used anymore, so store empty string)
     await pool.query(
       `
