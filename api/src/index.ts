@@ -89,6 +89,9 @@ const app = new Elysia()
   .get("/update", async ({ query }) => {
     const q = query as Record<string, string | string[] | undefined>;
 
+    // Log raw query so you can see if anything reaches this endpoint at all
+    console.log("Incoming /update query:", q);
+
     // For now, use a fixed device id. You can change this later if you want multiple devices.
     const deviceId = "helmet-001";
 
@@ -101,7 +104,7 @@ const app = new Elysia()
     const distanceCm = parseNumber(q.field7, "field7", { integer: true });
     const auxRaw = parseNumber(q.field8, "field8", { integer: true });
 
-    console.log("Incoming /update payload:", {
+    console.log("Parsed /update payload:", {
       heartBpm,
       spo2,
       skinTempF,
