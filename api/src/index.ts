@@ -84,6 +84,69 @@ const app = new Elysia()
     return { error: "Internal Server Error" };
   })
   .get("/", () => "ECS IoT API")
+  // ThingSpeak-compatible ingestion endpoint so the existing Arduino GET code keeps working.
+  // Example: GET /update?api_key=...&field1=...&field2=...&...&field8=...
+  .get("/update", async ({ query }) => {
+    const q = query as Record<string, string | string[] | undefined>;
+
+    // For now, use a fixed device id. You can change this later if you want multiple devices.
+    const deviceId = "helmet-001";
+
+    const heartBpm = parseNumber(q.field1, "field1", { integer: true });
+    const spo2 = parseNumber(q.field2, "field2", { integer: true });
+    const skinTempF = parseNumber(q.field3, "field3");
+    const envTempC = parseNumber(q.field4, "field4");
+    const flame = parseFlame(q.field5);
+    const lightRaw = parseNumber(q.field6, "field6", { integer: true });
+    const distanceCm = parseNumber(q.field7, "field7", { integer: true });
+    const auxRaw = parseNumber(q.field8, "field8", { integer: true });
+
+    // Ensure device exists (api_key_hash isn't used anymore, so store empty string)
+    await pool.query(
+      `
+      INSERT INTO devices (id, api_key_hash)
+      VALUES ($1, '')
+      ON CONFLICT (id) DO NOTHING;
+    `,
+      [deviceId]
+    );
+
+    await pool.query(
+      `
+      INSERT INTO readings (
+        device_id,
+        heart_bpm,
+        spo2_pct,
+        skin_temp_f,
+        env_temp_c,
+        flame,
+        light_raw,
+        distance_cm,
+        aux_raw
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    `,
+      [
+        deviceId,
+        heartBpm,
+        spo2,
+        skinTempF,
+        envTempC,
+        flame,
+        lightRaw,
+        distanceCm,
+        auxRaw,
+      ]
+    );
+
+    await pool.query(
+      `UPDATE devices SET last_seen_at = NOW() WHERE id = $1`,
+      [deviceId]
+    );
+
+    // Return a simple body similar to ThingSpeak (non-zero = success)
+    return "1";
+  })
   .post("/api/v1/readings", async ({ body, request, set }) => {
     const input = (body || {}) as ReadingInput;
 
@@ -190,7 +253,7 @@ const app = new Elysia()
   await initDb();
   const server = app.listen(3000);
 
-  console.log(
+console.log(
     `Elysia is running at ${server.server?.hostname}:${server.server?.port}`
-  );
+);
 })();
