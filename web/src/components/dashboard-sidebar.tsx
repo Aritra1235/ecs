@@ -61,7 +61,7 @@ export function DashboardSidebar() {
           {sidebarOpen ? (
             <>
               <div className="transition-all duration-300">
-                <h2 className="text-lg font-bold">Safe Mine Pro</h2>
+                <h2 className="text-lg font-bold">SafeMine Pro</h2>
               </div>
               <button
                 onClick={() => setSidebarOpen(false)}

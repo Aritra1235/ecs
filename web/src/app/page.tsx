@@ -20,15 +20,24 @@ export default function Home() {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
+            entry.target.classList.remove("opacity-0");
             entry.target.classList.add("animate-fade-in-up");
+            observer.unobserve(entry.target);
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.1, rootMargin: "50px" }
     );
 
     const sections = document.querySelectorAll(".observe-section");
-    sections.forEach((section) => observer.observe(section));
+    sections.forEach((section) => {
+      if (section.getBoundingClientRect().top < window.innerHeight) {
+        section.classList.remove("opacity-0");
+        section.classList.add("animate-fade-in-up");
+      } else {
+        observer.observe(section);
+      }
+    });
 
     return () => observer.disconnect();
   }, []);
@@ -441,8 +450,8 @@ export default function Home() {
 
           {/* Footer */}
           <footer className="mt-16 pt-8 border-t flex flex-col md:flex-row items-center justify-between gap-4 text-sm opacity-70">
-            <p>Safe Mine Pro · Smart Mining Helmet Safety Platform</p>
-            <p>© 2025 Safe Mine Pro. All rights reserved.</p>
+            <p>SafeMine Pro · Smart Mining Helmet Safety Platform</p>
+            <p>© 2025 SafeMine Pro. All rights reserved.</p>
           </footer>
         </div>
       </section>

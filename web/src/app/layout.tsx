@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Safe Mine Pro - Mining Helmet Monitoring",
+  title: "SafeMine Pro - Mining Helmet Monitoring",
   description: "Real-time monitoring system for mining helmets with live charts and instant alerts. Track temperature, gas levels, air quality, and more.",
 };
 
